@@ -37,7 +37,7 @@ export default function LoginForm() {
   const onSubmit: SubmitHandler<IDashboardLoginForm | any> = async (data) => {
     try {
       await login(data.email, data.password);
-      router.push("/");
+      router.push("/dashboard/requisicoes");
     } catch (err) {
       setError("password", { message: "email ou senha incorretos" });
     }

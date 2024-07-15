@@ -10,7 +10,7 @@ api.interceptors.request.use(
   async (config) => {
     const { isAuthenticated } = useAuth();
 
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     if (
       token &&

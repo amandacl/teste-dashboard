@@ -36,7 +36,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       const token = response.data.access;
 
-      localStorage.setItem("token", token);
+      sessionStorage.setItem("token", token);
 
       setIsAuthenticated(true);
     } catch (error) {
@@ -45,7 +45,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
     setIsAuthenticated(false);
   };
 
