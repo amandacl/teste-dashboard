@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, lazy } from "react";
-const RequisicoesPage = lazy(() => import("./requisicoes/page"));
+const ComprasPage = lazy(() => import("./compras/page"));
 import { DashboardTypePage } from "../enums/dashboard-type-page.enum";
 
 interface PaymentTypeSelectedProps {
@@ -10,7 +10,7 @@ interface PaymentTypeSelectedProps {
 
 const DashboardTypeSelected = ({ pageName }: PaymentTypeSelectedProps) => {
   const Page: { [key in DashboardTypePage]: JSX.Element | null } = {
-    [DashboardTypePage.SHOPPING]: <RequisicoesPage />,
+    [DashboardTypePage.SHOPPING]: <ComprasPage />,
     [DashboardTypePage.SERVICES]: <></>,
     [DashboardTypePage.SHIPPING]: <></>,
     [DashboardTypePage.INTERNAL_MAINTENANCE]: <></>,

@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../schemas/login-schema";
-import { useRouter } from "next/navigation";
 import { User, KeyRound } from "lucide-react";
 import { useAuth } from "../context/auth-context";
+import { useRouter } from "next/navigation";
 
 export interface IDashboardLoginForm {
   email?: string;
@@ -25,6 +25,7 @@ export default function LoginForm() {
     defaultValues: undefined,
   });
   const router = useRouter();
+
   const { login } = useAuth();
 
   const isDisabled = !isValid;
@@ -37,7 +38,7 @@ export default function LoginForm() {
   const onSubmit: SubmitHandler<IDashboardLoginForm | any> = async (data) => {
     try {
       await login(data.email, data.password);
-      router.push("/dashboard/requisicoes");
+      router.push("/dashboard/compras");
     } catch (err) {
       setError("password", { message: "email ou senha incorretos" });
     }
