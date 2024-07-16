@@ -1,8 +1,13 @@
 "use client";
 import {
-  createColumnHelper,
+  ColumnDef,
+  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  RowData,
   useReactTable,
 } from "@tanstack/react-table";
 
@@ -10,8 +15,9 @@ import { FullScreenLoading } from "src/app/components/full-screnn-loading.compon
 import { useGetPurchases } from "src/app/hooks/get-purchases.hook";
 import { useUser } from "src/app/hooks/user.hook";
 import { Pencil, ArrowRight, Check, List } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import NewRequestModal from "src/app/components/new-request-modal.component";
+import { Filter } from "src/app/components/filter-table";
 export interface IPurchases {
   id: string;
   listIcon: () => void;
@@ -27,63 +33,103 @@ export interface IPurchases {
   total_price: string;
 }
 
-const columnHelper = createColumnHelper<IPurchases>();
-
-const columns = [
-  columnHelper.accessor("listIcon", {
-    header: "",
-    cell: () => <List />,
-  }),
-  columnHelper.accessor("editIcon", {
-    header: "",
-    cell: () => <Pencil />,
-  }),
-  columnHelper.accessor("confirmIcon", {
-    header: "",
-    cell: () => <Check />,
-  }),
-  columnHelper.accessor("nextIcon", {
-    header: "",
-    cell: () => <ArrowRight />,
-  }),
-  columnHelper.accessor("company", {
-    cell: (info) => info.getValue(),
-    header: () => "Empresa",    
-  }),
-  columnHelper.accessor("department", {
-    cell: (info) => info.getValue(),
-    header: () => "Departamento",
-  }),
-  columnHelper.accessor("control_number", {
-    cell: (info) => info.getValue(),
-    header: () => "Número de controle",
-  }),
-  columnHelper.accessor("created_at", {
-    cell: (info) => info.getValue(),
-    header: () => "Data",
-  }),
-  columnHelper.accessor("request_date", {
-    cell: (info) => info.getValue(),
-    header: () => "Data de solicitação",
-  }),
-  columnHelper.accessor("total_price", {
-    cell: (info) => info.getValue(),
-    header: () => "Preço Total",
-  }),
-  columnHelper.accessor("obs", {
-    cell: (info) => info.getValue(),
-    header: () => "Observações",
-  }),
-];
+declare module "@tanstack/react-table" {
+  interface ColumnMeta<TData extends RowData, TValue> {
+    filterVariant?: "text" | "range" | "date";
+  }
+}
 
 export default function ComprasPage() {
   const { username } = useUser();
   const [isOpenNewRequestModal, setIsOpenNewRequestModal] = useState(false);
   const { data, isLoading, isFetching, isRefetching } = useGetPurchases();
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  const columns = useMemo<ColumnDef<IPurchases, any>[]>(
+    () => [
+      {
+        accessorKey: "listIcon",
+        header: "",
+        cell: () => <List />,
+      },
+      { accessorKey: "editIcon", header: "", cell: () => <Pencil /> },
+      { accessorKey: "confirmIcon", header: "", cell: () => <Check /> },
+      { accessorKey: "nextIcon", header: "", cell: () => <ArrowRight /> },
+      {
+        accessorKey: "company",
+        cell: (info) => info.getValue(),
+        header: () => "Empresa",
+        meta: {
+          filterVariant: "text",
+        },
+      },
+      {
+        accessorKey: "department",
+        cell: (info) => info.getValue(),
+        header: () => "Departamento",
+        meta: {
+          filterVariant: "text",
+        },
+      },
+      {
+        accessorKey: "control_number",
+        cell: (info) => info.getValue(),
+        header: () => "Número de controle",
+        meta: {
+          filterVariant: "range",
+        },
+      },
+      {
+        accessorKey: "created_at",
+        cell: (info) => info.getValue(),
+        header: () => "Data",
+        meta: {
+          filterVariant: "date",
+        },
+      },
+      {
+        accessorKey: "request_date",
+        cell: (info) => info.getValue(),
+        header: () => "Data de solicitação",
+        meta: {
+          filterVariant: "date",
+        },
+      },
+      {
+        accessorKey: "total_price",
+        cell: (info) => info.getValue(),
+        header: () => "Preço Total",
+        meta: {
+          filterVariant: "text",
+        },
+      },
+      {
+        accessorKey: "obs",
+        cell: (info) => info.getValue(),
+        header: () => "Observações",
+        meta: {
+          filterVariant: "text",
+        },
+      },
+    ],
+    []
+  );
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    filterFns: {},
+    state: {
+      columnFilters,
+    },
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    debugTable: true,
+    debugHeaders: true,
+    debugColumns: false,
   });
 
   if (isLoading || isFetching || isRefetching) {
@@ -130,14 +176,35 @@ export default function ComprasPage() {
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
-                      className="px-6 py-3 text-left text-xs uppercase whitespace-nowrap tracking-wider"
+                      colSpan={header.colSpan}
+                      className="px-6 py-3 space-y-2 text-left text-xs uppercase whitespace-nowrap tracking-wider"
                     >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                      {header.isPlaceholder ? null : (
+                        <>
+                          <div
+                            {...{
+                              className: header.column.getCanSort()
+                                ? "cursor-pointer select-none"
+                                : "",
+                              onClick: header.column.getToggleSortingHandler(),
+                            }}
+                          >
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                            {{
+                              asc: " 🔼",
+                              desc: " 🔽",
+                            }[header.column.getIsSorted() as string] ?? null}
+                          </div>
+                          {header.column.getCanFilter() ? (
+                            <div>
+                              <Filter column={header.column} />
+                            </div>
+                          ) : null}
+                        </>
+                      )}
                     </th>
                   ))}
                 </tr>
