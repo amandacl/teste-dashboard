@@ -10,6 +10,8 @@ import { FullScreenLoading } from "src/app/components/full-screnn-loading.compon
 import { useGetPurchases } from "src/app/hooks/get-purchases.hook";
 import { useUser } from "src/app/hooks/user.hook";
 import { Pencil, ArrowRight, Check, List } from "lucide-react";
+import { useState } from "react";
+import NewRequestModal from "src/app/components/new-request-modal.component";
 export interface IPurchases {
   id: string;
   listIcon: () => void;
@@ -46,7 +48,7 @@ const columns = [
   }),
   columnHelper.accessor("company", {
     cell: (info) => info.getValue(),
-    header: () => "Empresa",
+    header: () => "Empresa",    
   }),
   columnHelper.accessor("department", {
     cell: (info) => info.getValue(),
@@ -76,12 +78,14 @@ const columns = [
 
 export default function ComprasPage() {
   const { username } = useUser();
+  const [isOpenNewRequestModal, setIsOpenNewRequestModal] = useState(false);
   const { data, isLoading, isFetching, isRefetching } = useGetPurchases();
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+
   if (isLoading || isFetching || isRefetching) {
     return <FullScreenLoading isLoading={true} />;
   }
@@ -89,12 +93,15 @@ export default function ComprasPage() {
     <div className="flex-1 flex-col overflow-hidden gap-8">
       <div className="flex justify-between items-center flex-row p-8">
         <h1 className="text-3xl font-bold text-center">Olá, {username} </h1>
-        <button className="bg-blue-800 font-bold rounded-md text-white p-4">
+        <button
+          onClick={() => setIsOpenNewRequestModal(true)}
+          className="bg-blue-800 font-bold rounded-md text-white p-4"
+        >
           Nova Requisição
         </button>
       </div>
 
-      <nav className="border border-gray-100">
+      <nav className="border border-gray-100 flex justify-end items-center flex-row">
         <div className="flex space-x-8 px-8 py-3 text-left text-xs uppercase whitespace-nowrap tracking-wider">
           <a href="/" className="block py-2 px-4">
             Cotações
@@ -153,6 +160,10 @@ export default function ComprasPage() {
           </table>
         </div>
       </div>
+      <NewRequestModal
+        isOpen={isOpenNewRequestModal}
+        onClose={() => setIsOpenNewRequestModal(false)}
+      />
     </div>
   );
 }

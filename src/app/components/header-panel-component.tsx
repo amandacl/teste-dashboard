@@ -13,7 +13,7 @@ export default function HeaderPanel({ title }: headerProps) {
   const { logout } = useAuth();
   const { username } = useUser();
   const router = useRouter();
-  const [isOpenLogoutModal, onOpenLogoutModal] = useState(false);
+  const [isOpenLogoutModal, setisOpenLogoutModal] = useState(false);
 
   const onlyInitialNameLetters = (name: string) => {
     return name
@@ -33,7 +33,7 @@ export default function HeaderPanel({ title }: headerProps) {
         <h2>{title}</h2>
 
         <button
-          onClick={() => onOpenLogoutModal(true)}
+          onClick={() => setisOpenLogoutModal(true)}
           className="bg-gray-800 text-white font-bold py-2 px-4 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
         >
           {onlyInitialNameLetters(username)}
@@ -41,7 +41,7 @@ export default function HeaderPanel({ title }: headerProps) {
       </div>
       <LogoutModal
         isOpen={isOpenLogoutModal}
-        onClose={() => onOpenLogoutModal(false)}
+        onClose={() => setisOpenLogoutModal(false)}
         onConfirm={handleLogout}
       />
     </>

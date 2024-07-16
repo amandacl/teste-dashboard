@@ -1,4 +1,3 @@
-import { IDashboardLoginForm } from "../components/login-form.component";
 import { api } from "./api";
 
 class SessionService {
@@ -10,16 +9,5 @@ class SessionService {
       throw error.response.data;
     }
   }
-
-  public static async login(payload: IDashboardLoginForm) {
-    try {
-      const { data } = await api.post("/token", payload);
-
-      return data;
-    } catch (error: any) {
-      throw error.response.data;
-    }
-  }
 }
-
 export const sessionService = SessionService;
