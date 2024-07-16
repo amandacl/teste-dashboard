@@ -10,7 +10,7 @@ export default function Sidebar({
   handleSidebarToggle,
 }: SidebarModalProps) {
   return (
-    <div className="bg-blue-600 flex flex-col h-screen p-4 w-full items-center">
+    <div className="bg-blue-800 flex flex-col h-screen p-4 w-full items-center">
       <button
         className="bg-white py-2 px-4 text-black rounded-md"
         onClick={() => handleSidebarToggle()}

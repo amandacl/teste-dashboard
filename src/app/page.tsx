@@ -13,7 +13,7 @@ export default function Home() {
     const token = window?.sessionStorage.getItem("token");
     if (token) return router.push("/dashboard/compras");
   }, [router]);
-
+ 
   return (
     <div className="min-h-screen bg-gray-100">
       <header>
@@ -31,6 +31,7 @@ export default function Home() {
       </div>
 
       <Footer />
+      
     </div>
   );
 }

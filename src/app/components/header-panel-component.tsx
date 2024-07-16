@@ -4,13 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/auth-context";
 import LogoutModal from "./logout-modal.component";
+import { useUser } from "../hooks/user.hook";
 interface headerProps {
-  name: string;
   title: string;
 }
 
-export default function HeaderPanel({ name, title }: headerProps) {
+export default function HeaderPanel({ title }: headerProps) {
   const { logout } = useAuth();
+  const { username } = useUser();
   const router = useRouter();
   const [isOpenLogoutModal, onOpenLogoutModal] = useState(false);
 
@@ -28,14 +29,14 @@ export default function HeaderPanel({ name, title }: headerProps) {
 
   return (
     <>
-      <div className="flex justify-between items-center bg-blue-600 text-white p-4">
+      <div className="flex justify-between items-center bg-blue-800 text-white p-4">
         <h2>{title}</h2>
 
         <button
           onClick={() => onOpenLogoutModal(true)}
-          className="bg-blue-900 text-white font-bold py-2 px-4 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+          className="bg-gray-800 text-white font-bold py-2 px-4 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
         >
-          {onlyInitialNameLetters(name)}
+          {onlyInitialNameLetters(username)}
         </button>
       </div>
       <LogoutModal
