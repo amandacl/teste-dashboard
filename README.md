@@ -1,6 +1,6 @@
 # Dashboard
 
-The project needs to provide the best experience to users that wants to buy a car, offering to them the possibility to choose a vehicle and customize before the end of purchase.
+The project needs to provide the best experience for users who want to manage their company, offering them the possibility of launching purchases, shipping, services, etc.
 
 ## Tech Stack
 
