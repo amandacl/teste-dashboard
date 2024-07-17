@@ -1,9 +1,10 @@
+import { IUser } from "../interfaces/user.interface";
 import { api } from "./api";
 
 class SessionService {
-  public static async getUserById(id: string) {
+  public static async getUserById(id?: string) {
     try {
-      const { data } = await api.get(`users/${id}/`);
+      const { data } = await api.get<IUser>(`users/${id}/`);      
       return data;
     } catch (error: any) {
       throw error.response.data;

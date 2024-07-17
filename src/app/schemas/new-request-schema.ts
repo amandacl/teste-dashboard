@@ -7,14 +7,5 @@ export const requestSchema = z.object({
   company: z.string().min(1, "O campo Empresa é obrigatório."),
   obs_intern: z.string(),
   obs_extern: z.string(),
-  need_quote: z.boolean(),
-  products: z.array(
-    z.object({
-      name: z.string().min(1, "O nome do produto é obrigatório."),
-      unit: z.string().min(1, "A unidade do produto é obrigatória."),
-      quant: z
-        .number()
-        .min(1, "A quantidade do produto deve ser maior que zero."),
-    })
-  ),
+  need_quote: z.boolean()  
 });

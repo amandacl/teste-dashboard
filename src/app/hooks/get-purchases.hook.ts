@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { purchasesService } from "../services/purchases.service";
 import { getDate,getDatetime } from "../utils/dateTime.util";
+import { IPurchases } from "../interfaces/purchases.interface";
 
 export function useGetPurchases() {
   return useQuery({
@@ -10,7 +11,7 @@ export function useGetPurchases() {
     refetchOnWindowFocus: false,
     select: (data) => {
       return (
-        data.map((result: any) => ({
+        data?.map((result: IPurchases,index) => ({          
           id: result.id,
           department: result.department?.name,
           control_number: result.control_number,
@@ -18,7 +19,7 @@ export function useGetPurchases() {
           created_at: getDatetime(result.created_at),
           request_date: getDate(result.request_date),
           obs: result.obs,
-          price_total:result.products[0].price
+          total_price:result.products[index].price
         })) || []
       );
     },

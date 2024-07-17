@@ -13,17 +13,17 @@ import {
 
 import { FullScreenLoading } from "src/app/components/full-screnn-loading.component";
 import { useGetPurchases } from "src/app/hooks/get-purchases.hook";
-import { useUser } from "src/app/hooks/user.hook";
 import { Pencil, ArrowRight, Check, List } from "lucide-react";
 import { useMemo, useState } from "react";
 import NewRequestModal from "src/app/components/new-request-modal.component";
 import { Filter } from "src/app/components/filter-table";
-export interface IPurchases {
+import { useGetUsername } from "src/app/hooks/get-username.hook";
+export interface IPurchasesTable {
   id: string;
-  listIcon: () => void;
-  editIcon: () => void;
-  confirmIcon: () => void;
-  nextIcon: () => void;
+  listIcon?: () => void;
+  editIcon?: () => void;
+  confirmIcon?: () => void;
+  nextIcon?: () => void;
   department: string;
   control_number: number;
   company: string;
@@ -40,12 +40,12 @@ declare module "@tanstack/react-table" {
 }
 
 export default function ComprasPage() {
-  const { username } = useUser();
+  const { data: username } = useGetUsername();
   const [isOpenNewRequestModal, setIsOpenNewRequestModal] = useState(false);
-  const { data, isLoading, isFetching, isRefetching } = useGetPurchases();
+  const { data = [], isLoading, isFetching, isRefetching } = useGetPurchases();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-  const columns = useMemo<ColumnDef<IPurchases, any>[]>(
+  const columns = useMemo<ColumnDef<IPurchasesTable, any>[]>(
     () => [
       {
         accessorKey: "listIcon",
@@ -116,7 +116,7 @@ export default function ComprasPage() {
   );
 
   const table = useReactTable({
-    data,
+    data:data as IPurchasesTable[],
     columns,
     getCoreRowModel: getCoreRowModel(),
     filterFns: {},
@@ -126,10 +126,7 @@ export default function ComprasPage() {
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    debugTable: true,
-    debugHeaders: true,
-    debugColumns: false,
+    getPaginationRowModel: getPaginationRowModel()   
   });
 
   if (isLoading || isFetching || isRefetching) {

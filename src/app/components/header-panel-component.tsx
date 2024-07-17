@@ -4,18 +4,19 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/auth-context";
 import LogoutModal from "./logout-modal.component";
-import { useUser } from "../hooks/user.hook";
+import { useGetUsername } from "../hooks/get-username.hook";
 interface headerProps {
   title: string;
 }
 
 export default function HeaderPanel({ title }: headerProps) {
   const { logout } = useAuth();
-  const { username } = useUser();
+  const { data:username } = useGetUsername();
   const router = useRouter();
   const [isOpenLogoutModal, setisOpenLogoutModal] = useState(false);
 
-  const onlyInitialNameLetters = (name: string) => {
+  const onlyInitialNameLetters = (name?: string) => {
+    if(!name)return
     return name
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase())

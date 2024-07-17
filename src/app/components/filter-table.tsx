@@ -19,7 +19,7 @@ export function Filter({ column }: { column: Column<any, unknown> }) {
                 ])
               }
               placeholder={`Min`}
-              className="w-20 border shadow rounded h-8"
+              className="w-20 border shadow rounded h-8 px-2"
             />
             <SearchInput
               type="number"
@@ -31,7 +31,7 @@ export function Filter({ column }: { column: Column<any, unknown> }) {
                 ])
               }
               placeholder={`Max`}
-              className="w-20 border shadow rounded h-8"
+              className="w-20 border shadow rounded h-8 px-2"
             />
           </div>
           <div className="h-1" />
@@ -40,29 +40,17 @@ export function Filter({ column }: { column: Column<any, unknown> }) {
     case "date":
       return (
         <input
-          className="w-36 h-8 border  rounded"
+          className="w-36 h-8 border px-2 rounded"
           onChange={(value) => column.setFilterValue(value)}
           placeholder={`Buscar...`}
           type="date"
           value={(columnFilterValue ?? "") as string}
-        />
-      );
-
-      return (
-        <select
-          onChange={(e) => column.setFilterValue(e.target.value)}
-          value={columnFilterValue?.toString()}
-        >
-          <option value="">All</option>
-          <option value="complicated">complicated</option>
-          <option value="relationship">relationship</option>
-          <option value="single">single</option>
-        </select>
+        />        
       );
     case "text":
       return (
         <SearchInput
-          className="w-36 h-8 border  rounded"
+          className="w-36 h-8 border px-2 rounded"
           onChange={(value) => column.setFilterValue(value)}
           placeholder={`Buscar...`}
           type="text"

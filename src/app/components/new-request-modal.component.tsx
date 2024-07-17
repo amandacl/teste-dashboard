@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { requestSchema } from "../schemas/new-request-schema";
+import { NumericFormat } from "react-number-format";
 import {
   FileQuestion,
   FileWarning,
@@ -27,9 +28,10 @@ export default function NewRequestModal({ isOpen, onClose }: IModalProps) {
   const {
     register,
     handleSubmit,
-    setValue,
     watch,
-    formState: { errors },
+    setError,
+    resetField,
+    formState: { errors, isValid },
   } = useForm<INewRequest>({
     resolver: zodResolver(requestSchema),
   });
@@ -39,17 +41,28 @@ export default function NewRequestModal({ isOpen, onClose }: IModalProps) {
   const [products, setProducts] = useState<IProductRequest[]>([]);
 
   const handleAddProduct = () => {
-    if (!products) return;
-    const newProduct = {
-      name: watch(`products.${products.length}.name`),
-      unit_price: watch(`products.${products.length}.unit_price`),
-      amount: parseInt(watch(`products.${products.length}.amount`).toString()),
-    };
-
-    setProducts([...products, newProduct]);
-    setValue(`products.${products.length}.name`, "");
-    setValue(`products.${products.length}.unit_price`, "");
-    setValue(`products.${products.length}.amount`, 0);
+    const nameField = watch(`products.${products.length}.name`);
+    const unitPriceField = watch(`products.${products.length}.unit_price`);
+    const amountField = parseInt(
+      watch(`products.${products.length}.amount`).toString()
+    );
+    if (!nameField || !unitPriceField || !amountField) {
+      setError(`products.${products.length}.name`, {
+        message: "preencha todos os campos do produto antes de adicionar",
+      });
+      return;
+    }
+    setProducts([
+      ...products,
+      {
+        name: nameField,
+        amount: amountField,
+        unit_price: unitPriceField,
+      },
+    ]);
+    resetField(`products.${products.length}.name`);
+    resetField(`products.${products.length}.unit_price`);
+    resetField(`products.${products.length}.amount`);
   };
 
   const removeProduct = (index: number) => {
@@ -57,7 +70,8 @@ export default function NewRequestModal({ isOpen, onClose }: IModalProps) {
     updatedProducts.splice(index, 1);
     setProducts(updatedProducts);
   };
-
+  const enableSubmit = isValid && products.length > 0;
+  console.log(products);
   const onSubmit: SubmitHandler<INewRequest> = (data: INewRequest) => {
     console.log(data);
     //onClose(); // Fecha o modal após o envio do formulário
@@ -206,7 +220,7 @@ export default function NewRequestModal({ isOpen, onClose }: IModalProps) {
                         <div className="flex flex-row items-center space-x-2">
                           <select
                             id={`products.${products.length}.name`}
-                            {...register("department")}
+                            {...register(`products.${products.length}.name`)}
                             className={`mt-1 block w-4/5 px-3 py-3 border ${
                               errors?.products?.[products.length]?.name
                                 ? "border-red-500"
@@ -214,8 +228,9 @@ export default function NewRequestModal({ isOpen, onClose }: IModalProps) {
                             } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                           >
                             <option value="">Produto</option>
+
                             {dataProducts?.map((prod, index) => (
-                              <option key={index} value={prod.code}>
+                              <option key={index} value={prod.description}>
                                 {prod.description}
                               </option>
                             ))}
@@ -229,8 +244,9 @@ export default function NewRequestModal({ isOpen, onClose }: IModalProps) {
                               }
                             </span>
                           )}
+
                           <div className="flex justify-start items-center relative">
-                            <input
+                            {/* <input
                               id={`products.${products.length}.unit_price`}
                               placeholder="Preco Unit"
                               type="text"
@@ -242,6 +258,17 @@ export default function NewRequestModal({ isOpen, onClose }: IModalProps) {
                                   ? "border-red-500"
                                   : "border-gray-300"
                               } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                            /> */}
+                            <NumericFormat
+                              id={`products.${products.length}.unit_price`}
+                              name={`products.${products.length}.unit_price`}
+                              placeholder="Preco Unit"
+                              thousandSeparator="."
+                              decimalSeparator=","
+                              prefix="R$ "
+                              className={`mt-1 block w-36 px-8 py-3 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                              decimalScale={2}
+                              fixedDecimalScale={true}
                             />
                             <Banknote className="absolute mr-2 w-10 text-gray-500" />
                           </div>
@@ -338,25 +365,27 @@ export default function NewRequestModal({ isOpen, onClose }: IModalProps) {
                       </div>
                     </div>
                     <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
-                  <button
-                    className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                    type="button"
-                    onClick={() => onClose()}
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                    type="submit"
-                  >
-                    Confirmar
-                  </button>
-                </div>
+                      <button
+                        className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        type="button"
+                        onClick={() => onClose()}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        className={`font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 
+                        ${
+                          !enableSubmit
+                            ? "bg-gray-500 cursor-not-allowed"
+                            : "bg-emerald-500 text-white active:bg-emerald-600"
+                        }`}
+                        type="submit"
+                      >
+                        Confirmar
+                      </button>
+                    </div>
                   </form>
-
                 </div>
-
-              
               </div>
             </div>
           </div>
